@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMAUDIT-TI — Sistem Simulasi Audit Keamanan TI</title>
+<style>
+  :root {
+    --navy: #0f2b52;
+    --navy-mid: #1a3d6e;
+    --navy-light: #1e4d8c;
+    --accent: #1d9e75;
+    --accent-light: #e1f5ee;
+    --accent-dark: #0f6e56;
+    --amber: #f59e0b;
+    --amber-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-box {
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .header-titles { flex: 1; }
+  .header-titles h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .header-titles p { font-size: 12px; opacity: 0.7; margin-top: 1px; }
+  .header-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+  }
+
+  /* ─── NAV TABS ─── */
+  .nav-bar {
+    background: var(--navy-mid);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    padding: 11px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-btn:hover { color: rgba(255,255,255,0.9); }
+  .nav-btn.active {
+    color: white;
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .nav-num {
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .nav-btn.active .nav-num { background: var(--accent); }
+
+  /* ─── LAYOUT ─── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1.5px solid var(--gray-200);
+  }
+  .sec-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .sec-icon.green { background: var(--accent); }
+  .sec-icon.amber { background: var(--amber); }
+  .sec-icon.red { background: var(--red); }
+  .sec-title { font-size: 20px; font-weight: 700; color: var(--navy); }
+  .sec-sub { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-navy { background: #e8eef7; color: var(--navy); }
+  .badge-green { background: var(--accent-light); color: var(--accent-dark); }
+  .badge-amber { background: var(--amber-light); color: #92400e; }
+  .badge-red { background: var(--red-light); color: #991b1b; }
+
+  /* ─── TABLE ─── */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .styled-table th {
+    background: var(--navy);
+    color: white;
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .styled-table th:first-child { border-radius: 8px 0 0 0; }
+  .styled-table th:last-child { border-radius: 0 8px 0 0; }
+  .styled-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table tr:hover td { background: var(--gray-50); }
+  .term-name {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+  }
+  .term-en {
+    font-size: 11px;
+    color: var(--gray-400);
+    font-style: italic;
+  }
+
+  /* ─── LEARNING MODULE ─── */
+  .info-box {
+    background: var(--gray-50);
+    border-left: 3px solid var(--navy);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.65;
+  }
+  .info-box.green { border-left-color: var(--accent); }
+  .info-box.amber { border-left-color: var(--amber); }
+  .info-box.red { border-left-color: var(--red); }
+
+  .question-block {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .q-label { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+  .q-text { font-size: 14px; color: var(--gray-800); line-height: 1.5; }
+
+  select.q-select {
+    width: 100%;
+    max-width: 320px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--gray-300);
+    font-size: 14px;
+    color: var(--gray-800);
+    background: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  select.q-select:focus { border-color: var(--navy); }
+
+  .answer-result {
+    display: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+  .answer-result.yes { background: var(--accent-light); color: var(--accent-dark); }
+  .answer-result.no { background: var(--red-light); color: #991b1b; }
+
+  /* ─── RISK ASSESSMENT ─── */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 600px) { .risk-grid { grid-template-columns: 1fr; } }
+
+  .risk-input-group { display: flex; flex-direction: column; gap: 6px; }
+  .risk-label { font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px; }
+
+  input[type="range"].risk-range {
+    width: 100%;
+    height: 5px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    accent-color: var(--navy);
+  }
+
+  .range-row { display: flex; align-items: center; gap: 10px; }
+  .range-val {
+    min-width: 28px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .risk-result {
+    display: none;
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-top: 6px;
+  }
+  .risk-result.low { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .risk-result.medium { background: var(--amber-light); border: 1.5px solid #fde68a; }
+  .risk-result.high { background: var(--red-light); border: 1.5px solid #fecaca; }
+  .risk-result.critical { background: #1e1e1e; border: 1.5px solid #450a0a; }
+
+  .risk-score-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .risk-score-num { font-size: 36px; font-weight: 800; }
+  .risk-score-label { font-size: 13px; color: var(--gray-500); }
+  .risk-level-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { background: var(--navy-light); }
+  .btn:active { transform: scale(0.98); }
+  .btn.green { background: var(--accent); }
+  .btn.green:hover { background: var(--accent-dark); }
+  .btn.amber { background: var(--amber); color: #1c1917; }
+  .btn.red { background: var(--red); }
+
+  /* ─── GAP ANALYSIS ─── */
+  .gap-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .gap-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .gap-table th:first-child { border-radius: 8px 0 0 0; }
+  .gap-table th:last-child { border-radius: 0 8px 0 0; }
+  .gap-table td { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .gap-table tr:last-child td { border-bottom: none; }
+  .gap-table tr:hover td { background: var(--gray-50); }
+  .gap-table select.gap-sel {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1.5px solid var(--gray-300);
+    font-size: 13px;
+    color: var(--gray-800);
+    background: white;
+    cursor: pointer;
+    outline: none;
+  }
+  .gap-table select.gap-sel:focus { border-color: var(--navy); }
+
+  .maturity-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--gray-200);
+    overflow: hidden;
+    margin-top: 6px;
+    flex: 1;
+  }
+  .maturity-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-num { font-size: 12px; font-weight: 700; min-width: 16px; color: var(--navy); }
+
+  .gap-result { display: none; margin-top: 18px; }
+  .gap-summary {
+    background: var(--navy);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .gap-summary h3 { font-size: 14px; opacity: 0.7; margin-bottom: 6px; font-weight: 500; }
+  .gap-avg { font-size: 32px; font-weight: 800; margin-bottom: 2px; }
+  .gap-desc { font-size: 13px; opacity: 0.8; }
+
+  /* ─── CHECKLIST ─── */
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .checklist-item:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--gray-300);
+    background: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+  }
+  .check-box.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-content { flex: 1; }
+  .check-title { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+  .check-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .check-status {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .progress-bar-wrap {
+    background: var(--gray-200);
+    height: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 12px 0 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 10px;
+    transition: width 0.35s ease;
+  }
+  .progress-stats { font-size: 13px; color: var(--gray-500); }
+
+  /* ─── REPORT ─── */
+  .report-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 580px) { .report-meta-grid { grid-template-columns: 1fr; } }
+  .meta-group { display: flex; flex-direction: column; gap: 5px; }
+  .meta-label { font-size: 12px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; }
+  .meta-input {
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--gray-300);
+    font-size: 14px;
+    color: var(--gray-800);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .meta-input:focus { border-color: var(--navy); }
+
+  #report-output {
+    display: none;
+    background: #f8fafc;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-top: 18px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--gray-700);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 700px) {
+    .main { padding: 20px 14px 50px; }
+    .header-badge { display: none; }
+    .sec-title { font-size: 17px; }
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    text-align: center;
+    padding: 18px;
+    font-size: 12px;
+    color: var(--gray-400);
+    border-top: 1px solid var(--gray-200);
+    background: white;
+    margin-top: auto;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .stat-icon { font-size: 24px; }
+  .stat-label { font-size: 12px; color: var(--gray-500); }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-box">SIMAUDIT-TI</div>
+    <div class="header-titles">
+      <h1>Sistem Simulasi Audit Keamanan TI</h1>
+      <p>Platform Pembelajaran Audit &amp; Analisis Risiko Keamanan Informasi</p>
+    </div>
+    <div class="header-badge">v1.0 · Akademik</div>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showSection('kamus', this)">
+      📖 Kamus Audit <span class="nav-num">1</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('iso', this)">
+      🔒 ISO 27001 <span class="nav-num">2</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('cobit', this)">
+      📊 COBIT <span class="nav-num">3</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('nist', this)">
+      🛡️ NIST CSF <span class="nav-num">4</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('risiko', this)">
+      ⚠️ Risk Assessment <span class="nav-num">5</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('gap', this)">
+      📈 Gap Analysis <span class="nav-num">6</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('checklist', this)">
+      ✅ Audit Checklist <span class="nav-num">7</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('laporan', this)">
+      📄 Laporan Audit <span class="nav-num">8</span>
+    </button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════════════════════════════════
+       SECTION 1: KAMUS AUDIT SECURITY
+  ══════════════════════════════════════════ -->
+  <div id="kamus" class="section active">
+    <div class="sec-header">
+      <div class="sec-icon">📖</div>
+      <div>
+        <div class="sec-title">Kamus Istilah Audit Keamanan</div>
+        <div class="sec-sub">Referensi terminologi standar dalam audit keamanan informasi</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        📚 Daftar Istilah Audit Security
+        <span class="badge badge-navy">10 Istilah</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th style="width:5%">#</th>
+              <th style="width:20%">Istilah</th>
+              <th style="width:20%">Kategori</th>
+              <th>Penjelasan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">01</td>
+              <td>
+                <div class="term-name">Asset</div>
+                <div class="term-en">Information Asset</div>
+              </td>
+              <td><span class="badge badge-navy">Dasar</span></td>
+              <td>Segala sesuatu yang memiliki nilai bagi organisasi dan perlu dilindungi, meliputi data, sistem informasi, perangkat keras, perangkat lunak, serta sumber daya manusia yang mengelola informasi.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">02</td>
+              <td>
+                <div class="term-name">Threat</div>
+                <div class="term-en">Ancaman</div>
+              </td>
+              <td><span class="badge badge-red">Risiko</span></td>
+              <td>Potensi penyebab insiden yang tidak diinginkan yang dapat mengakibatkan kerugian pada sistem atau organisasi. Ancaman dapat berasal dari internal maupun eksternal, seperti peretas, bencana alam, atau kesalahan manusia.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">03</td>
+              <td>
+                <div class="term-name">Vulnerability</div>
+                <div class="term-en">Kerentanan</div>
+              </td>
+              <td><span class="badge badge-red">Risiko</span></td>
+              <td>Kelemahan pada aset atau kontrol keamanan yang dapat dieksploitasi oleh ancaman. Contoh: konfigurasi sistem yang salah, perangkat lunak yang tidak diperbarui, atau lemahnya kebijakan kata sandi.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">04</td>
+              <td>
+                <div class="term-name">Risk</div>
+                <div class="term-en">Risiko</div>
+              </td>
+              <td><span class="badge badge-amber">Analisis</span></td>
+              <td>Kombinasi dari kemungkinan terjadinya suatu ancaman yang mengeksploitasi kerentanan dan dampak yang ditimbulkan. Risiko = Kemungkinan (Likelihood) × Dampak (Impact).</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">05</td>
+              <td>
+                <div class="term-name">Security Control</div>
+                <div class="term-en">Kontrol Keamanan</div>
+              </td>
+              <td><span class="badge badge-green">Kontrol</span></td>
+              <td>Langkah pengamanan yang diterapkan untuk mengurangi risiko keamanan informasi. Dapat berupa kontrol preventif (mencegah), detektif (mendeteksi), atau korektif (memulihkan).</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">06</td>
+              <td>
+                <div class="term-name">Audit Trail</div>
+                <div class="term-en">Jejak Audit</div>
+              </td>
+              <td><span class="badge badge-navy">Audit</span></td>
+              <td>Rekaman kronologis aktivitas sistem yang memungkinkan rekonstruksi dan pemeriksaan urutan kejadian untuk tujuan investigasi atau pembuktian kepatuhan.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">07</td>
+              <td>
+                <div class="term-name">Confidentiality</div>
+                <div class="term-en">Kerahasiaan</div>
+              </td>
+              <td><span class="badge badge-green">CIA Triad</span></td>
+              <td>Prinsip keamanan yang memastikan informasi hanya dapat diakses oleh pihak yang berwenang. Merupakan salah satu dari tiga pilar keamanan informasi (CIA: Confidentiality, Integrity, Availability).</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">08</td>
+              <td>
+                <div class="term-name">Integrity</div>
+                <div class="term-en">Integritas</div>
+              </td>
+              <td><span class="badge badge-green">CIA Triad</span></td>
+              <td>Jaminan bahwa informasi tidak diubah secara tidak sah dan tetap akurat serta lengkap. Integritas data dapat dijaga melalui hash function, digital signature, dan kontrol akses.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">09</td>
+              <td>
+                <div class="term-name">Availability</div>
+                <div class="term-en">Ketersediaan</div>
+              </td>
+              <td><span class="badge badge-green">CIA Triad</span></td>
+              <td>Jaminan bahwa sistem, jaringan, dan data dapat diakses oleh pengguna yang berwenang setiap saat dibutuhkan. Termasuk perlindungan terhadap gangguan layanan (DoS/DDoS).</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--gray-400); text-align:center;">10</td>
+              <td>
+                <div class="term-name">Compliance</div>
+                <div class="term-en">Kepatuhan</div>
+              </td>
+              <td><span class="badge badge-amber">Regulasi</span></td>
+              <td>Tingkat kesesuaian organisasi dalam memenuhi persyaratan regulasi, standar, kebijakan, dan prosedur keamanan informasi yang berlaku, seperti ISO 27001, GDPR, atau regulasi OJK.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="stat-card">
+        <div class="stat-icon">🏛️</div>
+        <div>
+          <div class="stat-label">Standar yang Dicakup</div>
+          <div class="stat-value">ISO · COBIT · NIST</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📌</div>
+        <div>
+          <div class="stat-label">Total Istilah Tersedia</div>
+          <div class="stat-value">10 Istilah</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2: ISO 27001
+  ══════════════════════════════════════════ -->
+  <div id="iso" class="section">
+    <div class="sec-header">
+      <div class="sec-icon green">🔒</div>
+      <div>
+        <div class="sec-title">Modul Pembelajaran ISO 27001</div>
+        <div class="sec-sub">Information Security Management System (ISMS)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌐 Apa itu ISO 27001?</div>
+      <div class="info-box green">
+        <strong>ISO/IEC 27001</strong> adalah standar internasional untuk sistem manajemen keamanan informasi (Information Security Management System / ISMS). Standar ini diterbitkan oleh International Organization for Standardization (ISO) dan mendefinisikan persyaratan untuk menetapkan, menerapkan, memelihara, dan terus meningkatkan ISMS dalam konteks organisasi.
+        <br><br>
+        ISO 27001 menggunakan pendekatan berbasis risiko dan mencakup 14 domain kontrol keamanan (Annex A), dari kebijakan keamanan hingga kepatuhan regulasi. Sertifikasi ISO 27001 menjadi bukti komitmen organisasi terhadap keamanan informasi.
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">📋 Kontrol A.5 — Information Security Policies</div>
+      <div class="info-box">
+        <strong>A.5 — Kebijakan Keamanan Informasi</strong> merupakan domain pertama dalam ISO 27001 Annex A. Domain ini memastikan bahwa manajemen memberikan arahan dan dukungan yang jelas untuk keamanan informasi sesuai dengan kebutuhan bisnis dan regulasi yang berlaku.
+        <br><br>
+        <strong>A.5.1 — Manajemen Kebijakan Keamanan Informasi:</strong>
+        <ul style="margin-top: 8px; padding-left: 18px; line-height: 1.8;">
+          <li>Kebijakan keamanan informasi harus didefinisikan, disetujui manajemen, diterbitkan, dan dikomunikasikan kepada seluruh karyawan dan pihak eksternal terkait</li>
+          <li>Kebijakan harus ditinjau secara berkala atau ketika terjadi perubahan signifikan</li>
+          <li>Mencakup tujuan keamanan informasi yang selaras dengan strategi organisasi</li>
+        </ul>
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">🔍 Domain Kontrol ISO 27001 Annex A</div>
+      <div style="overflow-x: auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Nama Kontrol</th>
+              <th>Jumlah Kontrol</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">A.5</span></td><td>Information Security Policies</td><td style="text-align:center;">2</td></tr>
+            <tr><td><span class="badge badge-green">A.6</span></td><td>Organization of Information Security</td><td style="text-align:center;">7</td></tr>
+            <tr><td><span class="badge badge-green">A.7</span></td><td>Human Resource Security</td><td style="text-align:center;">6</td></tr>
+            <tr><td><span class="badge badge-green">A.8</span></td><td>Asset Management</td><td style="text-align:center;">10</td></tr>
+            <tr><td><span class="badge badge-green">A.9</span></td><td>Access Control</td><td style="text-align:center;">14</td></tr>
+            <tr><td><span class="badge badge-green">A.10</span></td><td>Cryptography</td><td style="text-align:center;">2</td></tr>
+            <tr><td><span class="badge badge-green">A.14</span></td><td>System Acquisition, Development and Maintenance</td><td style="text-align:center;">13</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">❓ Kuis Penilaian Mandiri — ISO 27001</div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 1 · A.5.1</div>
+        <div class="q-text">Apakah organisasi Anda memiliki kebijakan keamanan informasi yang terdokumentasi dan telah disetujui oleh manajemen?</div>
+        <select class="q-select" id="iso-q1" onchange="handleISOAnswer(1)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Sudah ada dan terdokumentasi</option>
+          <option value="tidak">Tidak — Belum ada kebijakan formal</option>
+          <option value="parsial">Sebagian — Dalam proses pengembangan</option>
+        </select>
+        <div class="answer-result" id="iso-r1"></div>
+      </div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 2 · A.5.1.2</div>
+        <div class="q-text">Apakah kebijakan keamanan informasi ditinjau secara berkala (minimal setahun sekali) atau ketika terjadi perubahan signifikan?</div>
+        <select class="q-select" id="iso-q2" onchange="handleISOAnswer(2)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Ditinjau secara rutin</option>
+          <option value="tidak">Tidak — Belum pernah ditinjau</option>
+          <option value="parsial">Sebagian — Pernah ditinjau namun tidak rutin</option>
+        </select>
+        <div class="answer-result" id="iso-r2"></div>
+      </div>
+
+      <div class="question-block">
+        <div class="q-label">Pertanyaan 3 · A.5.1.1</div>
+        <div class="q-text">Apakah kebijakan keamanan informasi telah dikomunikasikan kepada seluruh karyawan dan pihak eksternal yang relevan?</div>
+        <select class="q-select" id="iso-q3" onchange="handleISOAnswer(3)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Sudah dikomunikasikan secara menyeluruh</option>
+          <option value="tidak">Tidak — Belum dikomunikasikan</option>
+          <option value="parsial">Sebagian — Hanya kepada unit tertentu</option>
+        </select>
+        <div class="answer-result" id="iso-r3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3: COBIT
+  ══════════════════════════════════════════ -->
+  <div id="cobit" class="section">
+    <div class="sec-header">
+      <div class="sec-icon">📊</div>
+      <div>
+        <div class="sec-title">Modul Pembelajaran COBIT</div>
+        <div class="sec-sub">Control Objectives for Information and Related Technologies</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌐 Apa itu COBIT?</div>
+      <div class="info-box">
+        <strong>COBIT (Control Objectives for Information and Related Technologies)</strong> adalah framework tata kelola dan manajemen TI yang dikembangkan oleh ISACA. COBIT membantu organisasi mencapai tujuan bisnis melalui tata kelola TI yang efektif dengan menghubungkan kebutuhan bisnis dengan tujuan TI.
+        <br><br>
+        COBIT 2019 (versi terbaru) memiliki 40 tujuan tata kelola dan manajemen yang terorganisir dalam dua area utama: <strong>Governance</strong> (EDM) dan <strong>Management</strong> (APO, BAI, DSS, MEA).
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">📋 Domain APO — Align, Plan and Organize</div>
+      <div class="info-box amber">
+        <strong>APO (Align, Plan and Organize)</strong> adalah domain manajemen COBIT yang berfokus pada perencanaan strategis TI dan penyelarasan antara strategi TI dengan strategi bisnis organisasi.
+        <br><br>
+        Domain APO mencakup 14 proses manajemen meliputi:
+        <ul style="margin-top: 8px; padding-left: 18px; line-height: 1.8;">
+          <li><strong>APO01</strong> — Mengelola Kerangka Manajemen TI</li>
+          <li><strong>APO02</strong> — Mengelola Strategi TI (termasuk perencanaan TI yang jelas)</li>
+          <li><strong>APO03</strong> — Mengelola Arsitektur Perusahaan</li>
+          <li><strong>APO04</strong> — Mengelola Inovasi</li>
+          <li><strong>APO05</strong> — Mengelola Portofolio</li>
+          <li><strong>APO12</strong> — Mengelola Risiko (Risk Management)</li>
+          <li><strong>APO13</strong> — Mengelola Keamanan Informasi</li>
+        </ul>
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">🗂️ Domain-Domain COBIT 2019</div>
+      <div style="overflow-x: auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Nama</th>
+              <th>Area</th>
+              <th>Fokus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-navy">EDM</span></td>
+              <td>Evaluate, Direct and Monitor</td>
+              <td><span class="badge badge-navy">Governance</span></td>
+              <td>Evaluasi, pengarahan, dan pemantauan</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">APO</span></td>
+              <td>Align, Plan and Organize</td>
+              <td><span class="badge badge-amber">Management</span></td>
+              <td>Penyelarasan, perencanaan, dan pengorganisasian</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">BAI</span></td>
+              <td>Build, Acquire and Implement</td>
+              <td><span class="badge badge-amber">Management</span></td>
+              <td>Pembangunan, akuisisi, dan implementasi</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">DSS</span></td>
+              <td>Deliver, Service and Support</td>
+              <td><span class="badge badge-amber">Management</span></td>
+              <td>Pemberian layanan dan dukungan</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">MEA</span></td>
+              <td>Monitor, Evaluate and Assess</td>
+              <td><span class="badge badge-amber">Management</span></td>
+              <td>Pemantauan, evaluasi, dan penilaian</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">❓ Kuis Penilaian Mandiri — COBIT</div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 1 · APO02</div>
+        <div class="q-text">Apakah organisasi memiliki perencanaan strategis TI (IT Strategic Plan) yang jelas dan selaras dengan tujuan bisnis?</div>
+        <select class="q-select" id="cobit-q1" onchange="handleCOBITAnswer(1)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Memiliki IT Strategic Plan yang terdokumentasi</option>
+          <option value="tidak">Tidak — Belum memiliki perencanaan TI formal</option>
+          <option value="parsial">Sebagian — Ada perencanaan namun tidak formal</option>
+        </select>
+        <div class="answer-result" id="cobit-r1"></div>
+      </div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 2 · APO12</div>
+        <div class="q-text">Apakah organisasi memiliki proses manajemen risiko TI yang terstruktur dan terdokumentasi?</div>
+        <select class="q-select" id="cobit-q2" onchange="handleCOBITAnswer(2)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Proses manajemen risiko berjalan secara formal</option>
+          <option value="tidak">Tidak — Belum ada proses manajemen risiko</option>
+          <option value="parsial">Sebagian — Ada namun belum menyeluruh</option>
+        </select>
+        <div class="answer-result" id="cobit-r2"></div>
+      </div>
+
+      <div class="question-block">
+        <div class="q-label">Pertanyaan 3 · APO13</div>
+        <div class="q-text">Apakah organisasi telah mengimplementasikan sistem manajemen keamanan informasi (ISMS) sesuai framework yang berlaku?</div>
+        <select class="q-select" id="cobit-q3" onchange="handleCOBITAnswer(3)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — ISMS sudah diimplementasikan</option>
+          <option value="tidak">Tidak — Belum ada implementasi ISMS</option>
+          <option value="parsial">Sebagian — Dalam proses implementasi</option>
+        </select>
+        <div class="answer-result" id="cobit-r3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 4: NIST CSF
+  ══════════════════════════════════════════ -->
+  <div id="nist" class="section">
+    <div class="sec-header">
+      <div class="sec-icon red">🛡️</div>
+      <div>
+        <div class="sec-title">Modul Pembelajaran NIST CSF</div>
+        <div class="sec-sub">NIST Cybersecurity Framework</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌐 Apa itu NIST Cybersecurity Framework?</div>
+      <div class="info-box red">
+        <strong>NIST Cybersecurity Framework (NIST CSF)</strong> adalah kerangka kerja yang dikembangkan oleh National Institute of Standards and Technology (NIST) Amerika Serikat. Framework ini memberikan panduan bagi organisasi dalam mengelola dan mengurangi risiko keamanan siber secara terstruktur.
+        <br><br>
+        NIST CSF 2.0 (2024) terdiri dari <strong>6 fungsi inti</strong> yang membentuk siklus manajemen keamanan siber secara komprehensif.
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">🔍 Fungsi IDENTIFY — Identifikasi</div>
+      <div class="info-box">
+        <strong>IDENTIFY (Identifikasi)</strong> adalah fungsi pertama dan fondasi dari NIST CSF. Fungsi ini membantu organisasi untuk memahami konteks bisnis, sumber daya yang mendukung fungsi kritis, dan risiko keamanan siber terkait.
+        <br><br>
+        Sub-kategori utama fungsi Identify:
+        <ul style="margin-top: 8px; padding-left: 18px; line-height: 1.8;">
+          <li><strong>ID.AM — Asset Management:</strong> Identifikasi dan pengelolaan inventaris aset (perangkat, data, sistem, dan personel)</li>
+          <li><strong>ID.BE — Business Environment:</strong> Pemahaman misi, tujuan, pemangku kepentingan, dan aktivitas bisnis</li>
+          <li><strong>ID.GV — Governance:</strong> Kebijakan, prosedur, dan proses pengelolaan risiko keamanan informasi</li>
+          <li><strong>ID.RA — Risk Assessment:</strong> Identifikasi dan penilaian risiko keamanan siber terhadap aset organisasi</li>
+          <li><strong>ID.SC — Supply Chain Risk Management:</strong> Pengelolaan risiko rantai pasok TI</li>
+        </ul>
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">🗂️ 6 Fungsi Inti NIST CSF 2.0</div>
+      <div style="overflow-x: auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Fungsi</th>
+              <th>Nama</th>
+              <th>Deskripsi Singkat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-navy">GOVERN</span></td>
+              <td>Tata Kelola</td>
+              <td>Menetapkan strategi, kebijakan, dan akuntabilitas keamanan siber (Baru di CSF 2.0)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">IDENTIFY</span></td>
+              <td>Identifikasi</td>
+              <td>Memahami konteks bisnis dan risiko keamanan siber terhadap aset</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">PROTECT</span></td>
+              <td>Perlindungan</td>
+              <td>Menerapkan pengamanan untuk memastikan layanan infrastruktur kritis</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">DETECT</span></td>
+              <td>Deteksi</td>
+              <td>Mengidentifikasi terjadinya insiden keamanan siber secara tepat waktu</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">RESPOND</span></td>
+              <td>Respons</td>
+              <td>Mengambil tindakan terhadap insiden keamanan siber yang terdeteksi</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">RECOVER</span></td>
+              <td>Pemulihan</td>
+              <td>Memelihara rencana ketahanan dan memulihkan kapabilitas yang terdampak</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">❓ Kuis Penilaian Mandiri — NIST CSF</div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 1 · ID.AM</div>
+        <div class="q-text">Apakah organisasi melakukan identifikasi dan pencatatan inventaris aset TI (perangkat keras, perangkat lunak, dan data) secara rutin?</div>
+        <select class="q-select" id="nist-q1" onchange="handleNISTAnswer(1)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Inventaris aset dikelola dan diperbarui secara rutin</option>
+          <option value="tidak">Tidak — Belum ada inventaris aset yang terstruktur</option>
+          <option value="parsial">Sebagian — Ada inventaris namun tidak lengkap/rutin</option>
+        </select>
+        <div class="answer-result" id="nist-r1"></div>
+      </div>
+
+      <div class="question-block" style="margin-bottom: 14px;">
+        <div class="q-label">Pertanyaan 2 · ID.RA</div>
+        <div class="q-text">Apakah organisasi melakukan penilaian risiko keamanan siber secara berkala terhadap aset-aset kritisnya?</div>
+        <select class="q-select" id="nist-q2" onchange="handleNISTAnswer(2)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Risk assessment dilakukan secara periodik</option>
+          <option value="tidak">Tidak — Belum pernah dilakukan risk assessment formal</option>
+          <option value="parsial">Sebagian — Dilakukan namun tidak berkala</option>
+        </select>
+        <div class="answer-result" id="nist-r2"></div>
+      </div>
+
+      <div class="question-block">
+        <div class="q-label">Pertanyaan 3 · ID.GV</div>
+        <div class="q-text">Apakah organisasi memiliki kebijakan dan prosedur keamanan siber yang terdokumentasi dan diketahui oleh seluruh pemangku kepentingan?</div>
+        <select class="q-select" id="nist-q3" onchange="handleNISTAnswer(3)">
+          <option value="">— Pilih Jawaban —</option>
+          <option value="ya">Ya — Kebijakan terdokumentasi dan dikomunikasikan</option>
+          <option value="tidak">Tidak — Belum ada kebijakan formal</option>
+          <option value="parsial">Sebagian — Ada kebijakan namun belum menyeluruh</option>
+        </select>
+        <div class="answer-result" id="nist-r3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 5: RISK ASSESSMENT
+  ══════════════════════════════════════════ -->
+  <div id="risiko" class="section">
+    <div class="sec-header">
+      <div class="sec-icon amber">⚠️</div>
+      <div>
+        <div class="sec-title">Simulasi Risk Assessment</div>
+        <div class="sec-sub">Kalkulasi risiko berdasarkan likelihood × impact</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📐 Metodologi Penilaian Risiko</div>
+      <div class="info-box amber">
+        <strong>Formula Risiko:</strong> Risk Score = Likelihood (Kemungkinan) × Impact (Dampak)
+        <br><br>
+        Skala penilaian menggunakan nilai 1–5 untuk masing-masing dimensi, menghasilkan skor risiko 1–25. Klasifikasi risiko berdasarkan standar ISO 27005 dan NIST SP 800-30.
+      </div>
+
+      <div style="overflow-x: auto; margin-bottom: 18px;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Level Risiko</th>
+              <th>Skor</th>
+              <th>Warna</th>
+              <th>Tindakan yang Disarankan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">Rendah</span></td><td>1–4</td><td>Hijau</td><td>Accept — terima dengan pemantauan berkala</td></tr>
+            <tr><td><span class="badge badge-amber">Sedang</span></td><td>5–12</td><td>Kuning</td><td>Mitigate — kurangi dengan kontrol tambahan</td></tr>
+            <tr><td><span class="badge badge-red">Tinggi</span></td><td>13–19</td><td>Merah</td><td>Transfer/Treat — transfer atau tangani segera</td></tr>
+            <tr>
+              <td><span class="badge" style="background:#1a1a1a; color:#f87171;">Kritis</span></td>
+              <td>20–25</td>
+              <td>Hitam</td>
+              <td>Avoid — hindari atau hentikan aktivitas terkait</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎛️ Kalkulator Risiko Interaktif</div>
+
+      <div class="risk-grid">
+        <div class="risk-input-group">
+          <div class="risk-label">Aset yang Dinilai</div>
+          <input type="text" class="meta-input" id="risk-asset" placeholder="Contoh: Server Database Utama" style="width:100%">
+        </div>
+        <div class="risk-input-group">
+          <div class="risk-label">Jenis Ancaman</div>
+          <input type="text" class="meta-input" id="risk-threat" placeholder="Contoh: SQL Injection" style="width:100%">
+        </div>
+      </div>
+
+      <div class="risk-grid">
+        <div class="risk-input-group">
+          <div class="risk-label">Kemungkinan Terjadi (Likelihood) — <span id="lik-label">Sedang</span></div>
+          <div class="range-row">
+            <span style="font-size:12px; color:var(--gray-400);">1</span>
+            <input type="range" class="risk-range" min="1" max="5" value="3" id="likelihood" oninput="updateRisk()">
+            <span style="font-size:12px; color:var(--gray-400);">5</span>
+            <span class="range-val" id="lik-val">3</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray-400); padding: 0 2px;">
+            <span>Sangat Rendah</span><span>Sangat Tinggi</span>
+          </div>
+        </div>
+        <div class="risk-input-group">
+          <div class="risk-label">Dampak (Impact) — <span id="imp-label">Sedang</span></div>
+          <div class="range-row">
+            <span style="font-size:12px; color:var(--gray-400);">1</span>
+            <input type="range" class="risk-range" min="1" max="5" value="3" id="impact" oninput="updateRisk()">
+            <span style="font-size:12px; color:var(--gray-400);">5</span>
+            <span class="range-val" id="imp-val">3</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray-400); padding: 0 2px;">
+            <span>Sangat Rendah</span><span>Sangat Tinggi</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; margin-bottom: 16px;">
+        <div class="risk-label" style="margin-bottom: 8px;">Kontrol Keamanan yang Ada</div>
+        <select class="q-select" id="risk-control" style="max-width: 100%;" oninput="updateRisk()">
+          <option value="0">Tidak ada kontrol</option>
+          <option value="1">Kontrol minimal (firewall dasar)</option>
+          <option value="2" selected>Kontrol standar (antivirus, backup)</option>
+          <option value="3">Kontrol baik (IDS/IPS, enkripsi)</option>
+          <option value="4">Kontrol sangat baik (SOC, SIEM)</option>
+        </select>
+      </div>
+
+      <button class="btn" onclick="calculateRisk()">⚡ Hitung Risiko</button>
+
+      <div class="risk-result" id="risk-result">
+        <div class="risk-score-row">
+          <span class="risk-score-num" id="result-score">9</span>
+          <span class="risk-score-label">/ 25 — Skor Risiko</span>
+          <span class="risk-level-badge" id="result-level-badge">Sedang</span>
+        </div>
+        <div style="font-size:14px; color:var(--gray-700); margin-bottom: 8px;" id="result-formula"></div>
+        <div style="font-size:13px;" id="result-rec"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 6: GAP ANALYSIS
+  ══════════════════════════════════════════ -->
+  <div id="gap" class="section">
+    <div class="sec-header">
+      <div class="sec-icon green">📈</div>
+      <div>
+        <div class="sec-title">Gap Analysis — Maturity Level</div>
+        <div class="sec-sub">Analisis kesenjangan tingkat kematangan tata kelola TI</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Skala Tingkat Kematangan (Maturity Level)</div>
+      <div style="overflow-x: auto; margin-bottom: 8px;">
+        <table class="styled-table">
+          <thead>
+            <tr><th>Level</th><th>Nama</th><th>Deskripsi</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="text-align:center; font-weight:700;">0</td><td><span class="badge badge-red">Non-existent</span></td><td>Tidak ada proses yang dikenali; kegagalan total dalam pengelolaan TI</td></tr>
+            <tr><td style="text-align:center; font-weight:700;">1</td><td><span class="badge badge-red">Initial</span></td><td>Proses ad hoc dan tidak terorganisir; pendekatan reaktif dan tidak konsisten</td></tr>
+            <tr><td style="text-align:center; font-weight:700;">2</td><td><span class="badge badge-amber">Repeatable</span></td><td>Proses mengikuti pola reguler tetapi bergantung pada individu, belum terdokumentasi</td></tr>
+            <tr><td style="text-align:center; font-weight:700;">3</td><td><span class="badge badge-amber">Defined</span></td><td>Proses terdokumentasi, distandarisasi, dan dikomunikasikan melalui pelatihan</td></tr>
+            <tr><td style="text-align:center; font-weight:700;">4</td><td><span class="badge badge-green">Managed</span></td><td>Proses diukur dan dipantau; manajemen mengambil tindakan berdasarkan data</td></tr>
+            <tr><td style="text-align:center; font-weight:700;">5</td><td><span class="badge badge-green">Optimized</span></td><td>Proses disempurnakan secara berkelanjutan; best practices dan inovasi diterapkan</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔍 Penilaian Gap Analysis — Domain COBIT</div>
+      <div style="overflow-x: auto;">
+        <table class="gap-table">
+          <thead>
+            <tr>
+              <th style="width:30%">Domain / Proses</th>
+              <th style="width:20%">Level Saat Ini</th>
+              <th style="width:20%">Level Target</th>
+              <th>Visualisasi</th>
+            </tr>
+          </thead>
+          <tbody id="gap-tbody">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 16px; display:flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn green" onclick="analyzeGap()">📊 Analisis Kesenjangan</button>
+        <button class="btn" onclick="resetGap()" style="background: var(--gray-500);">↺ Reset</button>
+      </div>
+
+      <div class="gap-result" id="gap-result">
+        <div class="gap-summary" id="gap-summary"></div>
+        <div id="gap-items"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 7: AUDIT CHECKLIST
+  ══════════════════════════════════════════ -->
+  <div id="checklist" class="section">
+    <div class="sec-header">
+      <div class="sec-icon red">✅</div>
+      <div>
+        <div class="sec-title">Audit Checklist</div>
+        <div class="sec-sub">Daftar periksa standar audit keamanan informasi</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="justify-content: space-between;">
+        <span>📋 Progress Audit Checklist</span>
+        <span id="cl-counter" style="font-size:13px; font-weight:500; color:var(--gray-500);">0 / 0 selesai</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="cl-progress" style="width:0%"></div>
+      </div>
+      <div class="progress-stats" id="cl-pct">0% selesai</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔒 Kebijakan & Tata Kelola</div>
+      <div id="cl-cat-1"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🖥️ Keamanan Teknis & Infrastruktur</div>
+      <div id="cl-cat-2"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Keamanan Sumber Daya Manusia</div>
+      <div id="cl-cat-3"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚨 Manajemen Insiden & Keberlangsungan</div>
+      <div id="cl-cat-4"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 8: LAPORAN AUDIT
+  ══════════════════════════════════════════ -->
+  <div id="laporan" class="section">
+    <div class="sec-header">
+      <div class="sec-icon">📄</div>
+      <div>
+        <div class="sec-title">Pembuatan Laporan Audit Otomatis</div>
+        <div class="sec-sub">Generate laporan audit keamanan berdasarkan hasil penilaian</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 Informasi Audit</div>
+      <div class="report-meta-grid">
+        <div class="meta-group">
+          <label class="meta-label">Nama Organisasi</label>
+          <input type="text" class="meta-input" id="rep-org" placeholder="Contoh: PT Teknologi Nusantara">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">Nama Auditor</label>
+          <input type="text" class="meta-input" id="rep-auditor" placeholder="Contoh: Budi Santoso, S.Kom">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">Tanggal Audit</label>
+          <input type="date" class="meta-input" id="rep-date">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">Ruang Lingkup Audit</label>
+          <input type="text" class="meta-input" id="rep-scope" placeholder="Contoh: Sistem Informasi Keuangan">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">Standar yang Digunakan</label>
+          <select class="meta-input" id="rep-std" style="cursor:pointer; appearance: auto;">
+            <option value="ISO 27001:2022">ISO 27001:2022</option>
+            <option value="COBIT 2019">COBIT 2019</option>
+            <option value="NIST CSF 2.0">NIST CSF 2.0</option>
+            <option value="ISO 27001:2022 & COBIT 2019">ISO 27001 & COBIT 2019</option>
+            <option value="Semua Framework (ISO, COBIT, NIST)">Semua Framework</option>
+          </select>
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">Nomor Laporan</label>
+          <input type="text" class="meta-input" id="rep-num" placeholder="Contoh: AUDIT/2024/001">
+        </div>
+      </div>
+
+      <div class="meta-group" style="margin-bottom: 16px;">
+        <label class="meta-label">Temuan Utama (Ringkas)</label>
+        <textarea class="meta-input" id="rep-findings" rows="3" style="resize: vertical; font-family: inherit;" placeholder="Contoh: Kebijakan keamanan belum terdokumentasi, akses kontrol lemah, backup tidak rutin..."></textarea>
+      </div>
+
+      <div class="meta-group" style="margin-bottom: 18px;">
+        <label class="meta-label">Rekomendasi</label>
+        <textarea class="meta-input" id="rep-recs" rows="3" style="resize: vertical; font-family: inherit;" placeholder="Contoh: Segera dokumentasikan kebijakan keamanan, implementasikan MFA, lakukan backup harian..."></textarea>
+      </div>
+
+      <button class="btn green" onclick="generateReport()">📄 Generate Laporan Audit</button>
+      <button class="btn" onclick="printReport()" style="margin-left: 10px; background: var(--gray-600);">🖨️ Cetak Laporan</button>
+
+      <div id="report-output"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  SIMAUDIT-TI v1.0 &nbsp;·&nbsp; Sistem Simulasi Audit Keamanan Teknologi Informasi &nbsp;·&nbsp; Media Pembelajaran Akademik
+</div>
+
+<script>
+// ── NAVIGATION ──
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── ANSWER HANDLERS ──
+const msgYes = {
+  iso: ['✅ Sesuai dengan ISO 27001 A.5.1.1 — Kebijakan keamanan informasi yang ada menunjukkan komitmen manajemen. Pastikan kebijakan mencakup tujuan, ruang lingkup, dan prinsip keamanan informasi.', '✅ Sesuai dengan A.5.1.2 — Tinjauan berkala memastikan kebijakan tetap relevan. Catat tanggal tinjauan dan perubahan yang dibuat sebagai bukti audit.', '✅ Sesuai — Komunikasi yang efektif merupakan kunci implementasi kebijakan. Pertimbangkan pelatihan awareness keamanan secara rutin.'],
+  cobit: ['✅ Sesuai dengan APO02 — IT Strategic Plan yang jelas menunjukkan keselarasan TI-bisnis. Pastikan dikaji ulang minimal setahun sekali.', '✅ Sesuai dengan APO12 — Manajemen risiko yang terstruktur meningkatkan ketahanan organisasi terhadap ancaman TI.', '✅ Sesuai dengan APO13 — Implementasi ISMS merupakan fondasi keamanan informasi yang baik.'],
+  nist: ['✅ Sesuai dengan ID.AM — Inventaris aset yang rutin adalah dasar dari program keamanan siber yang efektif.', '✅ Sesuai dengan ID.RA — Penilaian risiko berkala memungkinkan prioritisasi kontrol keamanan yang tepat.', '✅ Sesuai dengan ID.GV — Kebijakan yang terdokumentasi dan dikomunikasikan memastikan keseragaman penerapan keamanan.']
+};
+const msgNo = {
+  iso: ['❌ Tidak sesuai — Tanpa kebijakan keamanan formal, organisasi rentan terhadap risiko. Segera kembangkan kebijakan mengacu pada ISO/IEC 27001 Annex A.5.', '❌ Tidak sesuai — Kebijakan yang tidak ditinjau dapat menjadi usang dan tidak relevan. Jadwalkan tinjauan kebijakan minimal 1x/tahun.', '❌ Tidak sesuai — Kebijakan yang tidak dikomunikasikan tidak dapat diimplementasikan secara efektif. Lakukan sosialisasi menyeluruh.'],
+  cobit: ['❌ Tidak sesuai — Tanpa IT Strategic Plan, investasi TI berisiko tidak selaras dengan tujuan bisnis. Kembangkan rencana strategis TI.', '❌ Tidak sesuai — Tanpa manajemen risiko formal, organisasi rentan terhadap ancaman yang tidak terduga.', '❌ Tidak sesuai — Implementasi ISMS perlu diprioritaskan untuk memastikan keamanan informasi yang sistematis.'],
+  nist: ['❌ Tidak sesuai — Inventaris aset yang tidak lengkap membuat perlindungan menjadi tidak efektif. Mulai dengan audit aset menyeluruh.', '❌ Tidak sesuai — Tanpa risk assessment, ancaman keamanan siber tidak dapat diprioritaskan dengan tepat.', '❌ Tidak sesuai — Kebijakan keamanan siber yang formal diperlukan sebagai panduan implementasi yang konsisten.']
+};
+const msgParsial = {
+  iso: ['⚠️ Parsial — Ada kemajuan yang baik. Lengkapi dokumentasi kebijakan dan dapatkan persetujuan formal dari manajemen puncak.', '⚠️ Parsial — Jadwalkan tinjauan kebijakan secara terjadwal dan catat sebagai bagian dari sistem manajemen dokumen.', '⚠️ Parsial — Perluas sosialisasi ke seluruh unit organisasi dan lakukan pelatihan awareness keamanan.'],
+  cobit: ['⚠️ Parsial — Formalisasikan perencanaan TI dengan mendokumentasikan, mendapatkan persetujuan, dan mengkomunikasikannya ke seluruh pemangku kepentingan.', '⚠️ Parsial — Perkuat proses manajemen risiko dengan mengadopsi metodologi standar seperti ISO 27005 atau NIST SP 800-30.', '⚠️ Parsial — Selesaikan implementasi ISMS secara menyeluruh dan pertimbangkan sertifikasi ISO 27001.'],
+  nist: ['⚠️ Parsial — Lengkapi inventaris aset dan tetapkan proses pembaruan rutin (minimal 6 bulan sekali).', '⚠️ Parsial — Jadwalkan risk assessment secara berkala dan integrasikan ke dalam siklus manajemen keamanan siber.', '⚠️ Parsial — Lengkapi kebijakan yang ada dan pastikan seluruh pemangku kepentingan memahami dan mematuhinya.']
+};
+
+function handleAnswer(framework, qNum) {
+  const val = document.getElementById(`${framework}-q${qNum}`).value;
+  const resEl = document.getElementById(`${framework}-r${qNum}`);
+  if (!val) { resEl.style.display = 'none'; return; }
+  const idx = qNum - 1;
+  resEl.style.display = 'block';
+  resEl.className = 'answer-result ' + (val === 'ya' ? 'yes' : val === 'tidak' ? 'no' : 'yes');
+  resEl.style.background = val === 'ya' ? 'var(--accent-light)' : val === 'tidak' ? 'var(--red-light)' : '#fffbeb';
+  resEl.style.color = val === 'ya' ? 'var(--accent-dark)' : val === 'tidak' ? '#991b1b' : '#92400e';
+  const msgs = val === 'ya' ? msgYes[framework] : val === 'tidak' ? msgNo[framework] : msgParsial[framework];
+  resEl.textContent = msgs[idx];
+}
+function handleISOAnswer(n) { handleAnswer('iso', n); }
+function handleCOBITAnswer(n) { handleAnswer('cobit', n); }
+function handleNISTAnswer(n) { handleAnswer('nist', n); }
+
+// ── RISK ASSESSMENT ──
+const likLabels = ['', 'Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
+function updateRisk() {
+  const l = document.getElementById('likelihood').value;
+  const i = document.getElementById('impact').value;
+  document.getElementById('lik-val').textContent = l;
+  document.getElementById('imp-val').textContent = i;
+  document.getElementById('lik-label').textContent = likLabels[l];
+  document.getElementById('imp-label').textContent = likLabels[i];
+}
+function calculateRisk() {
+  const l = parseInt(document.getElementById('likelihood').value);
+  const i = parseInt(document.getElementById('impact').value);
+  const ctrl = parseInt(document.getElementById('risk-control').value);
+  const asset = document.getElementById('risk-asset').value || 'Aset TI';
+  const threat = document.getElementById('risk-threat').value || 'Ancaman Umum';
+  const raw = l * i;
+  const score = Math.max(1, raw - ctrl);
+  const el = document.getElementById('risk-result');
+  el.style.display = 'block';
+  document.getElementById('result-score').textContent = score;
+  document.getElementById('result-formula').textContent = `Formula: ${l} (Likelihood) × ${i} (Impact) - ${ctrl} (Reduksi Kontrol) = ${score}`;
+
+  let level, bg, border, textc, rec;
+  if (score <= 4) {
+    level = 'RENDAH'; bg = '#f0fdf4'; border = '#bbf7d0'; textc = '#166534';
+    rec = '✅ ACCEPT — Risiko dapat diterima. Lakukan pemantauan berkala dan dokumentasikan penerimaan risiko.';
+  } else if (score <= 12) {
+    level = 'SEDANG'; bg = 'var(--amber-light)'; border = '#fde68a'; textc = '#78350f';
+    rec = '⚠️ MITIGATE — Terapkan kontrol tambahan untuk mengurangi likelihood atau impact. Buat rencana penanganan risiko.';
+  } else if (score <= 19) {
+    level = 'TINGGI'; bg = 'var(--red-light)'; border = '#fecaca'; textc = '#7f1d1d';
+    rec = '🚨 TRANSFER / TREAT — Risiko memerlukan penanganan segera. Pertimbangkan transfer risiko (asuransi) atau mitigasi kuat.';
+  } else {
+    level = 'KRITIS'; bg = '#1a1a1a'; border = '#450a0a'; textc = '#fca5a5';
+    rec = '🔴 AVOID — Risiko sangat tinggi. Hentikan atau hindari aktivitas yang memunculkan risiko ini hingga kontrol memadai diterapkan.';
+  }
+  el.style.background = bg;
+  el.style.border = '1.5px solid ' + border;
+  const badge = document.getElementById('result-level-badge');
+  badge.textContent = level;
+  badge.style.background = level === 'RENDAH' ? 'var(--accent-light)' : level === 'SEDANG' ? 'var(--amber-light)' : level === 'TINGGI' ? 'var(--red-light)' : '#450a0a';
+  badge.style.color = textc;
+  document.getElementById('result-score').style.color = textc;
+  document.getElementById('result-formula').style.color = textc;
+  document.getElementById('result-rec').style.color = textc;
+  document.getElementById('result-rec').innerHTML = `<strong>Aset: ${asset}</strong> | <strong>Ancaman: ${threat}</strong><br><br>${rec}`;
+}
+
+// ── GAP ANALYSIS ──
+const gapDomains = [
+  { code: 'APO01', name: 'Mengelola Kerangka Manajemen TI' },
+  { code: 'APO02', name: 'Mengelola Strategi TI' },
+  { code: 'APO12', name: 'Mengelola Risiko' },
+  { code: 'APO13', name: 'Mengelola Keamanan Informasi' },
+  { code: 'BAI01', name: 'Mengelola Program & Proyek' },
+  { code: 'DSS05', name: 'Mengelola Layanan Keamanan' },
+  { code: 'MEA01', name: 'Memantau, Evaluasi & Nilai Kinerja' },
+  { code: 'MEA02', name: 'Memantau Kontrol Internal' },
+];
+const gapMatLabels = ['Non-existent','Initial','Repeatable','Defined','Managed','Optimized'];
+const barColors = ['#dc2626','#ef4444','#f59e0b','#eab308','#16a34a','#15803d'];
+
+function buildGapTable() {
+  const tbody = document.getElementById('gap-tbody');
+  tbody.innerHTML = '';
+  gapDomains.forEach((d, idx) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>
+        <div style="font-weight:700; font-size:13px; color:var(--navy);">${d.code}</div>
+        <div style="font-size:12px; color:var(--gray-500);">${d.name}</div>
+      </td>
+      <td>
+        <select class="gap-sel" id="gap-cur-${idx}" onchange="updateGapBar(${idx})">
+          ${gapMatLabels.map((l,i) => `<option value="${i}">${i} — ${l}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="gap-sel" id="gap-tar-${idx}" onchange="updateGapBar(${idx})">
+          ${gapMatLabels.map((l,i) => `<option value="${i}" ${i===4?'selected':''}>${i} — ${l}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <div class="bar-row">
+          <span class="bar-num" id="gap-cur-num-${idx}">0</span>
+          <div class="maturity-bar"><div class="maturity-fill" id="gap-bar-cur-${idx}" style="width:0%; background:${barColors[0]};"></div></div>
+          <span style="font-size:11px; color:var(--gray-400);">→</span>
+          <div class="maturity-bar"><div class="maturity-fill" id="gap-bar-tar-${idx}" style="width:80%; background:${barColors[4]};"></div></div>
+          <span class="bar-num" id="gap-tar-num-${idx}">4</span>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+function updateGapBar(idx) {
+  const cur = parseInt(document.getElementById(`gap-cur-${idx}`).value);
+  const tar = parseInt(document.getElementById(`gap-tar-${idx}`).value);
+  document.getElementById(`gap-bar-cur-${idx}`).style.width = (cur/5*100)+'%';
+  document.getElementById(`gap-bar-cur-${idx}`).style.background = barColors[cur];
+  document.getElementById(`gap-bar-tar-${idx}`).style.width = (tar/5*100)+'%';
+  document.getElementById(`gap-bar-tar-${idx}`).style.background = barColors[tar];
+  document.getElementById(`gap-cur-num-${idx}`).textContent = cur;
+  document.getElementById(`gap-tar-num-${idx}`).textContent = tar;
+}
+function analyzeGap() {
+  let sumCur = 0, sumTar = 0;
+  const items = [];
+  gapDomains.forEach((d, idx) => {
+    const cur = parseInt(document.getElementById(`gap-cur-${idx}`).value);
+    const tar = parseInt(document.getElementById(`gap-tar-${idx}`).value);
+    sumCur += cur; sumTar += tar;
+    const gap = tar - cur;
+    items.push({ ...d, cur, tar, gap });
+  });
+  const avgCur = (sumCur / gapDomains.length).toFixed(1);
+  const avgTar = (sumTar / gapDomains.length).toFixed(1);
+  const avgGap = (avgTar - avgCur).toFixed(1);
+  const resEl = document.getElementById('gap-result');
+  resEl.style.display = 'block';
+  document.getElementById('gap-summary').innerHTML = `
+    <h3>Rata-rata Tingkat Kematangan Saat Ini</h3>
+    <div class="gap-avg">${avgCur} / 5.0</div>
+    <div class="gap-desc">Target: ${avgTar} &nbsp;|&nbsp; Kesenjangan: ${avgGap} level &nbsp;|&nbsp; ${gapDomains.length} domain dinilai</div>
+  `;
+  const itemsEl = document.getElementById('gap-items');
+  itemsEl.innerHTML = items.map(it => {
+    const gapColor = it.gap <= 0 ? '#16a34a' : it.gap === 1 ? '#ca8a04' : it.gap <= 2 ? '#ea580c' : '#dc2626';
+    const gapLabel = it.gap <= 0 ? '✅ Tercapai' : `⚠️ Gap: ${it.gap} level`;
+    return `<div class="card" style="padding: 14px 18px; margin-bottom: 10px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width: 200px;">
+        <div style="font-weight:700; font-size:13px; color:var(--navy);">${it.code} — ${it.name}</div>
+        <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">Level saat ini: ${it.cur} (${gapMatLabels[it.cur]}) → Target: ${it.tar} (${gapMatLabels[it.tar]})</div>
+      </div>
+      <div style="font-size:13px; font-weight:700; color:${gapColor}; white-space:nowrap;">${gapLabel}</div>
+    </div>`;
+  }).join('');
+  resEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetGap() {
+  buildGapTable();
+  document.getElementById('gap-result').style.display = 'none';
+}
+
+// ── CHECKLIST ──
+const checklistData = {
+  1: [
+    { id:'cl1', title:'Kebijakan Keamanan Informasi', sub:'Dokumen kebijakan telah dibuat, disetujui manajemen, dan didistribusikan' },
+    { id:'cl2', title:'Prosedur Pengelolaan Risiko', sub:'Prosedur identifikasi, penilaian, dan penanganan risiko terdokumentasi' },
+    { id:'cl3', title:'Klasifikasi Aset Informasi', sub:'Semua aset informasi teridentifikasi, dinilai, dan diklasifikasikan' },
+    { id:'cl4', title:'Kebijakan Akses Kontrol', sub:'Kebijakan hak akses berdasarkan prinsip least privilege diterapkan' },
+    { id:'cl5', title:'Kepatuhan Regulasi', sub:'Kepatuhan terhadap regulasi yang berlaku (UU PDP, OJK, dll) dipastikan' },
+  ],
+  2: [
+    { id:'cl6', title:'Firewall & Network Security', sub:'Firewall dikonfigurasi dengan benar, aturan direviu secara berkala' },
+    { id:'cl7', title:'Patch Management', sub:'Pembaruan sistem operasi dan aplikasi dilakukan secara rutin dan terjadwal' },
+    { id:'cl8', title:'Enkripsi Data', sub:'Data sensitif dienkripsi baik saat transit maupun saat disimpan (at-rest)' },
+    { id:'cl9', title:'Backup & Recovery', sub:'Backup data dilakukan rutin, prosedur recovery telah diuji' },
+    { id:'cl10', title:'Monitoring & Logging', sub:'Sistem logging aktif, log direviu secara berkala untuk deteksi anomali' },
+    { id:'cl11', title:'Vulnerability Assessment', sub:'Pemindaian kerentanan dilakukan minimal 6 bulan sekali' },
+  ],
+  3: [
+    { id:'cl12', title:'Pelatihan Keamanan (Security Awareness)', sub:'Seluruh karyawan mendapatkan pelatihan keamanan informasi minimal 1x/tahun' },
+    { id:'cl13', title:'Prosedur Onboarding & Offboarding', sub:'Proses pemberian dan pencabutan akses karyawan baru/keluar terdokumentasi' },
+    { id:'cl14', title:'Non-Disclosure Agreement (NDA)', sub:'NDA ditandatangani oleh seluruh karyawan dan vendor yang memiliki akses data' },
+    { id:'cl15', title:'Laporan Pelanggaran (Whistleblowing)', sub:'Mekanisme pelaporan insiden keamanan oleh karyawan tersedia dan berjalan' },
+  ],
+  4: [
+    { id:'cl16', title:'Rencana Respons Insiden', sub:'Incident Response Plan terdokumentasi dan telah dilatih (tabletop exercise)' },
+    { id:'cl17', title:'Business Continuity Plan (BCP)', sub:'BCP mencakup skenario gangguan utama dan prosedur pemulihan bisnis' },
+    { id:'cl18', title:'Disaster Recovery Plan (DRP)', sub:'DRP untuk sistem kritis telah diuji dengan Recovery Time Objective (RTO) yang jelas' },
+    { id:'cl19', title:'Pengelolaan Vendor & Pihak Ketiga', sub:'Kontrak vendor mencakup persyaratan keamanan; audit pihak ketiga dilakukan' },
+  ]
+};
+let checkState = {};
+function buildChecklist() {
+  [1,2,3,4].forEach(cat => {
+    const el = document.getElementById(`cl-cat-${cat}`);
+    el.innerHTML = checklistData[cat].map(item => `
+      <div class="checklist-item" id="cli-${item.id}">
+        <div class="check-box" id="cb-${item.id}" onclick="toggleCheck('${item.id}')"></div>
+        <div class="check-content">
+          <div class="check-title">${item.title}</div>
+          <div class="check-sub">${item.sub}</div>
+        </div>
+        <span class="check-status" id="cs-${item.id}" style="background:var(--gray-100); color:var(--gray-400);">Belum</span>
+      </div>
+    `).join('');
+    checklistData[cat].forEach(item => { checkState[item.id] = false; });
+  });
+  updateCheckProgress();
+}
+function toggleCheck(id) {
+  checkState[id] = !checkState[id];
+  const cb = document.getElementById(`cb-${id}`);
+  const cs = document.getElementById(`cs-${id}`);
+  if (checkState[id]) {
+    cb.classList.add('checked');
+    cb.textContent = '✓';
+    cs.style.background = 'var(--accent-light)';
+    cs.style.color = 'var(--accent-dark)';
+    cs.textContent = 'Selesai';
+  } else {
+    cb.classList.remove('checked');
+    cb.textContent = '';
+    cs.style.background = 'var(--gray-100)';
+    cs.style.color = 'var(--gray-400)';
+    cs.textContent = 'Belum';
+  }
+  updateCheckProgress();
+}
+function updateCheckProgress() {
+  const all = Object.keys(checkState).length;
+  const done = Object.values(checkState).filter(Boolean).length;
+  const pct = all > 0 ? Math.round(done / all * 100) : 0;
+  document.getElementById('cl-counter').textContent = `${done} / ${all} selesai`;
+  document.getElementById('cl-progress').style.width = pct + '%';
+  document.getElementById('cl-pct').textContent = `${pct}% selesai`;
+  document.getElementById('cl-progress').style.background = pct >= 80 ? 'var(--accent)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+}
+
+// ── LAPORAN AUDIT ──
+function generateReport() {
+  const org = document.getElementById('rep-org').value || '[Nama Organisasi]';
+  const auditor = document.getElementById('rep-auditor').value || '[Nama Auditor]';
+  const date = document.getElementById('rep-date').value || new Date().toISOString().split('T')[0];
+  const scope = document.getElementById('rep-scope').value || '[Ruang Lingkup]';
+  const std = document.getElementById('rep-std').value;
+  const num = document.getElementById('rep-num').value || 'AUDIT/2024/001';
+  const findings = document.getElementById('rep-findings').value || '[Temuan audit belum diisi]';
+  const recs = document.getElementById('rep-recs').value || '[Rekomendasi belum diisi]';
+
+  const all = Object.keys(checkState).length;
+  const done = Object.values(checkState).filter(Boolean).length;
+  const pct = all > 0 ? Math.round(done / all * 100) : 0;
+  const compLevel = pct >= 80 ? 'BAIK' : pct >= 50 ? 'CUKUP' : 'PERLU PERBAIKAN';
+
+  const now = new Date().toLocaleDateString('id-ID', { year:'numeric', month:'long', day:'numeric' });
+  const report = `
+╔══════════════════════════════════════════════════════════════════╗
+║          LAPORAN AUDIT KEAMANAN TEKNOLOGI INFORMASI              ║
+║                        SIMAUDIT-TI                               ║
+╚══════════════════════════════════════════════════════════════════╝
+
+NOMOR LAPORAN  : ${num}
+TANGGAL CETAK  : ${now}
+KLASIFIKASI    : RAHASIA / TERBATAS
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN I — INFORMASI UMUM AUDIT
+══════════════════════════════════════════════════════════════════
+
+  Nama Organisasi    : ${org}
+  Nama Auditor       : ${auditor}
+  Tanggal Audit      : ${new Date(date).toLocaleDateString('id-ID', {year:'numeric',month:'long',day:'numeric'})}
+  Ruang Lingkup      : ${scope}
+  Standar/Framework  : ${std}
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN II — RINGKASAN EKSEKUTIF
+══════════════════════════════════════════════════════════════════
+
+  Audit keamanan informasi telah dilaksanakan terhadap ${scope}
+  pada ${org}. Audit ini menggunakan pendekatan berbasis 
+  risiko sesuai dengan standar ${std}.
+
+  Tingkat kepatuhan checklist : ${pct}% (${done}/${all} item)
+  Status Kepatuhan Umum       : ${compLevel}
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN III — TEMUAN AUDIT
+══════════════════════════════════════════════════════════════════
+
+  ${findings.split('\n').map((l,i) => `  ${i+1}. ${l}`).join('\n  ')}
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN IV — REKOMENDASI
+══════════════════════════════════════════════════════════════════
+
+  ${recs.split('\n').map((l,i) => `  ${i+1}. ${l}`).join('\n  ')}
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN V — HASIL CHECKLIST AUDIT
+══════════════════════════════════════════════════════════════════
+
+  Total item diperiksa   : ${all} item
+  Item telah dipenuhi    : ${done} item (${pct}%)
+  Item belum dipenuhi    : ${all - done} item (${100 - pct}%)
+  
+  ${Object.entries(checkState).map(([id, val]) => {
+    const allItems = Object.values(checklistData).flat();
+    const item = allItems.find(i => i.id === id);
+    return item ? `  [${val ? '✓' : ' '}] ${item.title}` : '';
+  }).filter(Boolean).join('\n  ')}
+
+══════════════════════════════════════════════════════════════════
+  BAGIAN VI — KESIMPULAN & TINDAK LANJUT
+══════════════════════════════════════════════════════════════════
+
+  Berdasarkan hasil audit yang telah dilaksanakan, ${org}
+  menunjukkan tingkat kepatuhan sebesar ${pct}% terhadap 
+  standar ${std}.
+
+  ${pct >= 80 
+    ? '  Secara umum, implementasi keamanan informasi sudah berjalan\n  dengan baik. Lakukan peningkatan berkelanjutan dan audit\n  secara berkala untuk mempertahankan tingkat kepatuhan.'
+    : pct >= 50 
+    ? '  Implementasi keamanan informasi perlu diperkuat pada beberapa\n  area. Prioritaskan perbaikan temuan kritis dan buat rencana\n  aksi perbaikan dalam 3 bulan ke depan.'
+    : '  Implementasi keamanan informasi masih memerlukan perbaikan\n  signifikan. Segera buat rencana perbaikan komprehensif dan\n  lakukan re-audit dalam 6 bulan ke depan.'
+  }
+
+══════════════════════════════════════════════════════════════════
+  TANDA TANGAN
+══════════════════════════════════════════════════════════════════
+
+  Auditor,                          Disetujui,
+
+  
+  ${auditor}                        ___________________________
+  Lead Auditor                      Manajemen ${org}
+  
+  Tanggal: ${new Date(date).toLocaleDateString('id-ID')}
+
+══════════════════════════════════════════════════════════════════
+  Laporan ini dibuat oleh SIMAUDIT-TI - Sistem Simulasi Audit
+  Keamanan Teknologi Informasi | Media Pembelajaran Akademik
+══════════════════════════════════════════════════════════════════
+`;
+  const el = document.getElementById('report-output');
+  el.style.display = 'block';
+  el.textContent = report;
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function printReport() {
+  const content = document.getElementById('report-output').textContent;
+  if (!content) { generateReport(); }
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>Laporan Audit - SIMAUDIT-TI</title>
+  <style>body{font-family:monospace;font-size:13px;padding:30px;line-height:1.8;}
+  @media print{@page{margin:15mm;}}</style></head>
+  <body><pre>${document.getElementById('report-output').textContent}</pre></body></html>`);
+  w.document.close();
+  w.print();
+}
+
+// ── INIT ──
+document.getElementById('rep-date').valueAsDate = new Date();
+buildChecklist();
+buildGapTable();
+updateRisk();
+</script>
+</body>
+</html>
